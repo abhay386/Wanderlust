@@ -32,10 +32,13 @@ const user = require("./models/user.js");
 const { default: MongoStore } = require('connect-mongo');
 const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
+// Fallback secret used only if SECRET is not provided (not recommended for production)
+const sessionSecret = process.env.SECRET || "change-this-in-production";
+
 const store  =  MongoStore.create({
     mongoUrl: dbUrl,
     crypto: {
-        secret:process.env.SECRET
+        secret: sessionSecret
     },
 
     touchafter: 24*3600,
