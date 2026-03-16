@@ -8,12 +8,10 @@ if(process.env.NODE_ENV != "production"){
 require('dotenv').config()
 }
 
-
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const port = 8080;
+const port = process.env.PORT || 8080;
 // const Listing = require("./models/listings.js");
 const path = require("path");
 const methodOverride = require("method-override");
@@ -32,10 +30,10 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const user = require("./models/user.js");
 const { default: MongoStore } = require('connect-mongo');
-const dbUrl = process.env.ATLASDB_URL;
+const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
 const store  =  MongoStore.create({
-    mongoUrl:dbUrl,
+    mongoUrl: dbUrl,
     crypto: {
         secret:process.env.SECRET
     },
@@ -44,8 +42,8 @@ const store  =  MongoStore.create({
 })
 
 
-store.on("error",()=>{
-    consoe.log("ERROR in MONGO SESSION STORE", err);
+store.on("error",(err)=>{
+    console.log("ERROR in MONGO SESSION STORE", err);
 })
 
 const sessionOptions = {
