@@ -24,25 +24,21 @@ const listing = require("./Routes/listing2.js");
 const reviews = require("./Routes/reviews2.js");
 const User = require("./Routes/user2.js");
 const session = require("express-session");
-const MangoStore = require("connect-mongo");
+const { MongoStore } = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const user = require("./models/user.js");
-const { default: MongoStore } = require('connect-mongo');
 const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
 // Fallback secret used only if SECRET is not provided (not recommended for production)
 const sessionSecret = process.env.SECRET || "change-this-in-production";
 
-const store  =  MongoStore.create({
+const store = new MongoStore({
     mongoUrl: dbUrl,
-    crypto: {
-        secret: sessionSecret
-    },
-
-    touchafter: 24*3600,
-})
+    secret: sessionSecret,
+    touchAfter: 24 * 3600,
+});
 
 
 store.on("error",(err)=>{
@@ -51,13 +47,13 @@ store.on("error",(err)=>{
 
 const sessionOptions = {
     store,
-    secret:process.env.SECRET,
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-        expires:Date.now() + 7 * 24 * 60 * 60 * 1000,
-        maxAge:7 * 24 * 60 * 60 * 1000,
-        httpOnly:true
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true
     }
 };
 
@@ -148,12 +144,11 @@ app.all(/.*/,(req,res,next)=>{
 })
 
 // Error handling middleware;
-app.use((err,req,res,next)=>{
-    let {status= 500,message="Something went wrong"} = err;
-    res.render("error.ejs" ,{message})
+app.use((err, req, res, next) => {
+    let { status = 500, message = "Something went wrong" } = err;
+    res.render("error.ejs", { message });
     // res.status(status).send(message)
-    
-})
+});
 
 app.listen(port,()=>{
     console.log("Server is litening on port =>", port)
